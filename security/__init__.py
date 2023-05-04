@@ -3,5 +3,5 @@ from security.config import Config
 
 
 def create_app(config_class=Config):
-    print(config_class.SECRET_KEY)
-    print(config_class.SQLALCHEMY_DATABASE_URI)
+    app = Flask(__name__)
+    app.config.from_object(config_class)
