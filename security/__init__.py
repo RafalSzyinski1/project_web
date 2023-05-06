@@ -22,8 +22,10 @@ def create_app(config_class=Config):
     # autopep8: off
     from security.main.routes import main
     from security.users.routes import users
+    from security.errors.routes import errors
 
     app.register_blueprint(main)
     app.register_blueprint(users)
+    app.register_blueprint(errors)
 
     return app
