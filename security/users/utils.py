@@ -1,10 +1,7 @@
 import os
 import secrets
 from PIL import Image
-from flask import url_for, current_app
-
-from security import login_manager
-from security.models.models import User
+from flask import current_app
 
 
 def save_picture(form_picture):
