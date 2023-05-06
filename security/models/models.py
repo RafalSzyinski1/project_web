@@ -29,7 +29,7 @@ class Key(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(254), nullable=False, unique=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     lock_to_key = db.relationship('KeyLocks', backref='key', lazy=True)
     key_usage = db.relationship('KeyUsageHistory', backref='key', lazy=True)

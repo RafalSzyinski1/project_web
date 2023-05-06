@@ -5,6 +5,7 @@ from flask_login import (login_user, current_user, logout_user, login_required)
 from security import db, bcrypt
 from security.users.forms import UpdateAccountForm, UpdateAccountPasswordForm
 from security.users.utils import save_picture
+from security.models.models import Key
 
 users = Blueprint('users', __name__)
 
@@ -12,16 +13,17 @@ users = Blueprint('users', __name__)
 @users.route("/account")
 @login_required
 def account():
+    keys = Key.query.filter_by(
+        key_user=current_user).order_by(Key.name.asc()).all()
     image_file = url_for(
         'static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html', title='Account', image_file=image_file)
+    return render_template('account.html', title='Account', image_file=image_file, keys=keys)
 
 
 @users.route("/account/update", methods=['GET', 'POST'])
 @login_required
 def update_account():
     form = UpdateAccountForm()
-
     if form.validate_on_submit():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)

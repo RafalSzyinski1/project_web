@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <div class="content-section">
     <div class="media">
         <img class="rounded-circle account-img" src="{{ image_file }}">
@@ -16,11 +17,28 @@
             </div>
         </div>
     </div>
-    <div class="border-top pt-1">
-        <small class="text-muted">
-            <a class="ml-2" href="{{ url_for('users.update_account') }}">Update Account</a>
-            <a class="ml-2" href="{{ url_for('users.update_password') }}">Update Password</a>
-        </small>
+</div>
+
+
+<div class="content-section">
+    <h3 class="border-bottom">Account Option</h3>
+    <div class="list-group">
+        <a class="ml-2 list-group-item" href="#">User History</a>
+        <a class="ml-2 list-group-item" href="{{ url_for('users.update_account') }}">Update Account</a>
+        <a class="ml-2 list-group-item" href="{{ url_for('users.update_password') }}">Update Password</a>
     </div>
+</div>
+
+<div class="content-section">
+    <h3 class="border-bottom">User Keys</h3>
+    <ul class="list-group">
+        {% for key in keys %}
+        <li class="list-group-item">Name: {{ key.name }}
+            <button type="button" class="btn btn-primary float-right btn-sm" href="#">
+                Key History
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock content %}
