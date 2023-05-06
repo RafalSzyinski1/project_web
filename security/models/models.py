@@ -13,9 +13,11 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(254), nullable=False)
     surname = db.Column(db.String(254), nullable=False)
-    login = db.Column(db.String(254), nullable=False)
+    email = db.Column(db.String(254), nullable=False)
     password = db.Column(db.String(60), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    image_file = db.Column(db.String(60), nullable=False,
+                           default='default.jpg')
 
     keys = db.relationship('Key', backref='key_user', lazy=True)
 
