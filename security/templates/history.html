@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <h3 class="border-bottom">{{ title }}</h3>
+    <ul class="list-group">
+        {% for record in history %}
+        <li class="list-group-item">Date: {{ record.date }}
+            Key: {{ record.key.name }}
+            Lock: {{ record.lock.name }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}
