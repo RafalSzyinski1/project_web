@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <h3 class="border-bottom">Users</h3>
+    <ul class="list-group">
+        {% for user in users.items %}
+        <li class="list-group-item">
+            <div class="row justify-content-between">
+                <div class="col">
+                    <div class="text-truncate">
+                        <span class="font-weight-bold">Email:</span>
+                        <br>
+                        <span class="text-muted">{{ user.email }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-truncate">
+                        <span class="font-weight-bold">Name:</span>
+                        <br>
+                        <span class="text-muted">{{ user.name }} {{ user.surname }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-truncate">
+                        <span class="font-weight-bold">Admin: </span>
+                        <br>
+                        {% if not user.is_admin %}
+                        <h4><i class="bi bi-x"></i></h4>
+                        {% else %}
+                        <h5><i class="bi bi-check-lg"></i></h5>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-auto">
+                    {% if user != current_user %}
+                    <button type="button" class="btn btn-primary" href="#">Edytuj</button>
+                    {% else %}
+                    <button type="button" class="btn btn-primary" disabled>Edytuj</button>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+{% if page_num %}
+{% if users.page == page_num %}
+{% if user %}
+<a class="btn btn-info mb-4" href="{{ url_for('users.update_users', page=page_num, user=user) }}">{{ page_num }}</a>
+{% else %}
+<a class="btn btn-info mb-4" href="{{ url_for('users.update_users', page=page_num, key=key) }}">{{ page_num }}</a>
+{% endif %}
+{% else %}
+{% if user %}
+<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_users', page=page_num, user=user) }}">{{ page_num
+    }}</a>
+{% else %}
+<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_users', page=page_num, key=key) }}">{{ page_num
+    }}</a>
+{% endif %}
+{% endif %}
+{% else %}
+...
+{% endif %}
+{% endfor %}
+{% endblock content %}

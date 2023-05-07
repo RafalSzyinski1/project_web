@@ -26,6 +26,11 @@
         <a class="ml-2 list-group-item" href="{{ url_for('main.history', user=current_user.id) }}">User History</a>
         <a class="ml-2 list-group-item" href="{{ url_for('users.update_account') }}">Update Account</a>
         <a class="ml-2 list-group-item" href="{{ url_for('users.update_password') }}">Update Password</a>
+        {% if current_user.is_admin %}
+        <a class="ml-2 list-group-item" href="{{ url_for('users.update_users') }}">Update Users</a>
+        <a class="ml-2 list-group-item" href="#">Update Keys</a>
+        <a class="ml-2 list-group-item" href="#">Update Locks</a>
+        {% endif %}
     </div>
 </div>
 <div class="content-section">

@@ -5,7 +5,7 @@ from flask_login import (login_user, current_user, logout_user, login_required)
 from security import db, bcrypt
 from security.users.forms import UpdateAccountForm, UpdateAccountPasswordForm
 from security.users.utils import save_picture
-from security.models.models import Key
+from security.models.models import Key, User
 
 users = Blueprint('users', __name__)
 
@@ -56,3 +56,15 @@ def update_password():
         else:
             flash('New password cannot be the same as old password', 'danger')
     return render_template('update_password.html', title='Update Account', form=form)
+
+
+@users.route("/update_users")
+@login_required
+def update_users():
+    if not current_user.is_admin:
+        flash("Access deny", "danger")
+        return redirect("/")
+    page = request.args.get('page', 1, type=int)
+    users = User.query.order_by(
+        User.surname.asc()).paginate(page=page, per_page=5)
+    return render_template("users.html", title="Update Users", users=users)
