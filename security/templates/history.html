@@ -3,12 +3,46 @@
 <div class="content-section">
     <h3 class="border-bottom">{{ title }}</h3>
     <ul class="list-group">
-        {% for record in history %}
-        <li class="list-group-item">Date: {{ record.date }}
-            Key: {{ record.key.name }}
-            Lock: {{ record.lock.name }}
+        {% for record in history.items %}
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="font-weight-bold">Date:</span>
+                    <br>
+                    <span class="text-muted">{{ record.date.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="font-weight-bold">Key name:</span>
+                    <br>
+                    <span class="text-muted">{{ record.key.name }}</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="font-weight-bold">Lock name:</span>
+                    <br>
+                    <span class="text-muted">{{ record.lock.name }}</span>
+                </div>
+            </div>
         </li>
         {% endfor %}
     </ul>
 </div>
+{% for page_num in history.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+{% if page_num %}
+{% if history.page == page_num %}
+{% if user %}
+<a class="btn btn-info mb-4" href="{{ url_for('main.history', page=page_num, user=user) }}">{{ page_num }}</a>
+{% else %}
+<a class="btn btn-info mb-4" href="{{ url_for('main.history', page=page_num, key=key) }}">{{ page_num }}</a>
+{% endif %}
+{% else %}
+{% if user %}
+<a class="btn btn-outline-info mb-4" href="{{ url_for('main.history', page=page_num, user=user) }}">{{ page_num }}</a>
+{% else %}
+<a class="btn btn-outline-info mb-4" href="{{ url_for('main.history', page=page_num, key=key) }}">{{ page_num }}</a>
+{% endif %}
+{% endif %}
+{% else %}
+...
+{% endif %}
+{% endfor %}
 {% endblock content %}
