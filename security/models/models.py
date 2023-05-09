@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from security import db, login_manager
+from security import db, login_manager, bcrypt
 from flask_login import UserMixin
 
 
@@ -20,6 +20,11 @@ class User(db.Model, UserMixin):
                            default='default.jpg')
 
     keys = db.relationship('Key', backref='key_user', lazy=True)
+
+    def admin_restart_password(self):
+        new_pass = self.name[0] + self.surname
+        self.password = bcrypt.generate_password_hash(new_pass)
+        db.session.commit()
 
     def __repr__(self):
         return f"User({self.name} {self.surname})"

@@ -3,7 +3,7 @@ from flask import (Blueprint, render_template,
 from flask_login import (login_user, current_user, logout_user, login_required)
 
 from security import db, bcrypt
-from security.users.forms import UpdateAccountForm, UpdateAccountPasswordForm
+from security.users.forms import UpdateAccountForm, UpdateAccountPasswordForm, AdminUpdateAccountForm
 from security.users.utils import save_picture
 from security.models.models import Key, User, Lock
 
@@ -46,15 +46,19 @@ def update_account():
 def update_password():
     form = UpdateAccountPasswordForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(
-            form.password.data).decode('utf-8')
-        if not bcrypt.check_password_hash(current_user.password, form.password.data):
-            current_user.password = hashed_password
-            db.session.commit()
-            flash('Your password has been updated!', 'success')
-            return redirect(url_for('users.account'))
+        if not bcrypt.check_password_hash(current_user.password, form.old_password.data):
+            flash('Old password is wrong', 'danger')
         else:
-            flash('New password cannot be the same as old password', 'danger')
+            hashed_password = bcrypt.generate_password_hash(
+                form.password.data).decode('utf-8')
+
+            if not bcrypt.check_password_hash(current_user.password, form.password.data):
+                current_user.password = hashed_password
+                db.session.commit()
+                flash('Your password has been updated!', 'success')
+                return redirect(url_for('users.account'))
+            else:
+                flash('New password cannot be the same as old password', 'danger')
     return render_template('update_password.html', title='Update Account', form=form)
 
 
@@ -67,6 +71,42 @@ def update_users():
     users = User.query.order_by(
         User.surname.asc()).paginate(page=page, per_page=5)
     return render_template("users.html", title="Update Users", users=users)
+
+
+@users.route("/update/users/<int:user_id>/edit_account", methods=["GET", "POST"])
+@login_required
+def edit_users_account(user_id):
+    if not current_user.is_admin:
+        abort(403)
+    form = AdminUpdateAccountForm()
+    user = User.query.get_or_404(user_id)
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            user.image_file = picture_file
+        user.name = form.name.data
+        user.surname = form.surname.data
+        user.is_admin = form.admin.data
+        db.session.commit()
+        flash(f'{user.name} account has been updated!', 'success')
+        return redirect(url_for('users.update_users'))
+    elif request.method == 'GET':
+        form.name.data = user.name
+        form.surname.data = user.surname
+        form.admin.data = user.is_admin
+    return render_template('admin_edit_user.html', title='Edit user', form=form)
+
+
+@users.route("/update/users/<int:user_id>/restart_password")
+@login_required
+def restart_password(user_id):
+    if not current_user.is_admin:
+        abort(403)
+    user = User.query.get_or_404(user_id)
+    user.admin_restart_password()
+    flash(
+        f'Password was restarted for {user.name}. Password contain first letter of name concat with surname', 'info')
+    return redirect(url_for('users.account'))
 
 
 @users.route("/update/keys")

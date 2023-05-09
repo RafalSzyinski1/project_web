@@ -34,10 +34,15 @@
                 </div>
                 <div class="col-auto">
                     {% if user != current_user %}
-                    <button type="button" class="btn btn-primary" href="#">Edit</button>
+                    <a type="button" class="btn btn-primary"
+                        href="{{ url_for('users.edit_users_account', user_id=user.id)}}">Edit</a>
+                    <a type="button" class="btn btn-danger"
+                        href="{{ url_for('users.restart_password', user_id=user.id) }}">Reset password</a>
                     {% else %}
                     <button type="button" class="btn btn-primary" disabled>Edit</button>
+                    <button type="button" class="btn btn-danger" disabled>Reset password</button>
                     {% endif %}
+
                 </div>
             </div>
         </li>
