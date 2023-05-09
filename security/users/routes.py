@@ -5,7 +5,7 @@ from flask_login import (login_user, current_user, logout_user, login_required)
 from security import db, bcrypt
 from security.users.forms import UpdateAccountForm, UpdateAccountPasswordForm
 from security.users.utils import save_picture
-from security.models.models import Key, User
+from security.models.models import Key, User, Lock
 
 users = Blueprint('users', __name__)
 
@@ -78,3 +78,14 @@ def update_keys():
     keys = Key.query.order_by(
         Key.name.asc()).paginate(page=page, per_page=5)
     return render_template("keys.html", title="Update Keys", keys=keys)
+
+
+@users.route("/update/locks")
+@login_required
+def update_locks():
+    if not current_user.is_admin:
+        abort(403)
+    page = request.args.get('page', 1, type=int)
+    locks = Lock.query.order_by(
+        Lock.name.asc()).paginate(page=page, per_page=5)
+    return render_template("locks.html", title="Update Locks", locks=locks)

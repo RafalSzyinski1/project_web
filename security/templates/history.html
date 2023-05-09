@@ -3,6 +3,7 @@
 <div class="content-section">
     <h3 class="border-bottom">{{ title }}</h3>
     <ul class="list-group">
+        {% if history.items %}
         {% for record in history.items %}
         <li class="list-group-item">
             <div class="row">
@@ -24,6 +25,9 @@
             </div>
         </li>
         {% endfor %}
+        {% else %}
+        <li class="list-group-item">None</li>
+        {% endif %}
     </ul>
 </div>
 {% for page_num in history.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}

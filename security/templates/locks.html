@@ -1,29 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="content-section">
-    <h3 class="border-bottom">Keys</h3>
+    <h3 class="border-bottom">Locks</h3>
     <ul class="list-group">
-        {% if keys.items %}
-        {% for key in keys.items %}
+        {% if locks.items %}
+        {% for lock in locks.items %}
         <li class="list-group-item">
             <div class="row justify-content-between">
                 <div class="col">
                     <div class="text-truncate">
                         <span class="font-weight-bold">Name:</span>
                         <br>
-                        <span class="text-muted">{{ key.name }}</span>
+                        <span class="text-muted">{{ lock.name }}</span>
                     </div>
                 </div>
                 <div class="col">
                     <div class="text-truncate">
-                        <span class="font-weight-bold">Owner:</span>
-                        <br>
-                        <span class="text-muted">{{ key.key_user.name }}</span>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="text-truncate">
-                        <span class="font-weight-bold">Locks:</span>
+                        <span class="font-weight-bold">Keys:</span>
                         <br>
                         <button type="button" class="btn btn-info btn-sm" href="#">Show/Add</button>
                     </div>
@@ -38,9 +31,9 @@
         {% endif %}
     </ul>
 </div>
-{% for page_num in keys.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+{% for page_num in locks.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
 {% if page_num %}
-{% if keys.page == page_num %}
+{% if locks.page == page_num %}
 <a class="btn btn-info mb-4" href="{{ url_for('users.update_keys', page=page_num) }}">{{ page_num }}</a>
 {% else %}
 <a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_keys', page=page_num) }}">{{ page_num }}</a>
