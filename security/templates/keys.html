@@ -25,7 +25,8 @@
                     <div class="text-truncate">
                         <span class="font-weight-bold">Locks:</span>
                         <br>
-                        <button type="button" class="btn btn-info btn-sm" href="#">Show/Add</button>
+                        <a type="button" class="btn btn-info btn-sm"
+                            href="{{ url_for('users.key_show_locks', key_id=key.id) }}">Show/Add</a>
                     </div>
                 </div>
                 <div class="col-auto">

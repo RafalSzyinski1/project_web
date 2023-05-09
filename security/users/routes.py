@@ -5,7 +5,7 @@ from flask_login import (login_user, current_user, logout_user, login_required)
 from security import db, bcrypt
 from security.users.forms import UpdateAccountForm, UpdateAccountPasswordForm, AdminUpdateAccountForm
 from security.users.utils import save_picture
-from security.models.models import Key, User, Lock
+from security.models.models import Key, User, Lock, KeyLocks
 
 users = Blueprint('users', __name__)
 
@@ -118,6 +118,56 @@ def update_keys():
     keys = Key.query.order_by(
         Key.name.asc()).paginate(page=page, per_page=5)
     return render_template("keys.html", title="Update Keys", keys=keys)
+
+
+@users.route("/update/show_locks_for_key/<int:key_id>")
+@login_required
+def key_show_locks(key_id):
+    if not current_user.is_admin:
+        abort(403)
+    page = request.args.get('page', 1, type=int)
+    locks = Lock.query.paginate(page=page, per_page=10)
+    key_locks = Lock.query.join(KeyLocks).filter(
+        KeyLocks.key_id == key_id).all()
+    return render_template('locks_for_key.html', locks=locks, key_locks=key_locks, key_id=key_id, page=page)
+
+
+@users.route("/update/add_key_to_lock/<int:key_id>")
+@login_required
+def key_add_lock(key_id):
+    if not current_user.is_admin:
+        abort(403)
+    lock_id = request.args.get('lock_id', None, type=int)
+    page = request.args.get('page', 1, type=int)
+
+    if key_id and lock_id:
+        key_lock = KeyLocks(key_id=key_id, lock_id=lock_id)
+        db.session.add(key_lock)
+        db.session.commit()
+        flash('Lock has been added', 'info')
+    else:
+        flash('Something wrong. Cannot add this lock to key', 'danger')
+    return redirect(url_for('users.key_show_locks', key_id=key_id, page=page))
+
+
+@users.route("/update/remove_key_to_lock/<int:key_id>")
+@login_required
+def key_remove_lock(key_id):
+    if not current_user.is_admin:
+        abort(403)
+    lock_id = request.args.get('lock_id', None, type=int)
+    page = request.args.get('page', 1, type=int)
+    if key_id and lock_id:
+        key_lock = KeyLocks.query.filter_by(
+            key_id=key_id).filter_by(lock_id=lock_id).first_or_404()
+        print(key_lock)
+        db.session.delete(key_lock)
+        db.session.commit()
+        flash('Lock has been removed', 'info')
+    else:
+        flash('Something wrong. Cannot add this lock to key', 'danger')
+        return redirect("/")
+    return redirect(url_for('users.key_show_locks', key_id=key_id, page=page))
 
 
 @users.route("/update/locks")
