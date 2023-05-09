@@ -62,7 +62,7 @@ def update_password():
     return render_template('update_password.html', title='Update Account', form=form)
 
 
-@users.route("/update/users")
+@users.route("/users")
 @login_required
 def update_users():
     if not current_user.is_admin:
@@ -73,7 +73,7 @@ def update_users():
     return render_template("users.html", title="Update Users", users=users)
 
 
-@users.route("/update/users/<int:user_id>/edit_account", methods=["GET", "POST"])
+@users.route("/users/<int:user_id>/edit_account", methods=["GET", "POST"])
 @login_required
 def edit_users_account(user_id):
     if not current_user.is_admin:
@@ -97,7 +97,7 @@ def edit_users_account(user_id):
     return render_template('admin_edit_user.html', title='Edit user', form=form)
 
 
-@users.route("/update/users/<int:user_id>/restart_password")
+@users.route("/users/<int:user_id>/restart_password")
 @login_required
 def restart_password(user_id):
     if not current_user.is_admin:
@@ -109,7 +109,7 @@ def restart_password(user_id):
     return redirect(url_for('users.account'))
 
 
-@users.route("/update/keys")
+@users.route("/keys")
 @login_required
 def update_keys():
     if not current_user.is_admin:
@@ -120,11 +120,12 @@ def update_keys():
     return render_template("keys.html", title="Update Keys", keys=keys)
 
 
-@users.route("/update/show_locks_for_key/<int:key_id>")
+@users.route("/keys/show_locks_for_key/<int:key_id>")
 @login_required
 def key_show_locks(key_id):
     if not current_user.is_admin:
         abort(403)
+    Key.query.get_or_404(key_id)
     page = request.args.get('page', 1, type=int)
     locks = Lock.query.paginate(page=page, per_page=10)
     key_locks = Lock.query.join(KeyLocks).filter(
@@ -132,11 +133,13 @@ def key_show_locks(key_id):
     return render_template('locks_for_key.html', locks=locks, key_locks=key_locks, key_id=key_id, page=page)
 
 
-@users.route("/update/add_key_to_lock/<int:key_id>")
+@users.route("/keys/add_key_to_lock/<int:key_id>")
 @login_required
 def key_add_lock(key_id):
     if not current_user.is_admin:
         abort(403)
+    Key.query.get_or_404(key_id)
+
     lock_id = request.args.get('lock_id', None, type=int)
     page = request.args.get('page', 1, type=int)
 
@@ -150,11 +153,13 @@ def key_add_lock(key_id):
     return redirect(url_for('users.key_show_locks', key_id=key_id, page=page))
 
 
-@users.route("/update/remove_key_to_lock/<int:key_id>")
+@users.route("/keys/remove_key_to_lock/<int:key_id>")
 @login_required
 def key_remove_lock(key_id):
     if not current_user.is_admin:
         abort(403)
+    Key.query.get_or_404(key_id)
+
     lock_id = request.args.get('lock_id', None, type=int)
     page = request.args.get('page', 1, type=int)
     if key_id and lock_id:
@@ -170,7 +175,7 @@ def key_remove_lock(key_id):
     return redirect(url_for('users.key_show_locks', key_id=key_id, page=page))
 
 
-@users.route("/update/locks")
+@users.route("/locks")
 @login_required
 def update_locks():
     if not current_user.is_admin:
