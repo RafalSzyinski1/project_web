@@ -1,5 +1,5 @@
 from flask import (Blueprint, render_template,
-                   url_for, flash, redirect, request)
+                   url_for, flash, redirect, request, abort)
 from flask_login import (login_user, current_user, logout_user, login_required)
 
 from security import db, bcrypt
@@ -58,13 +58,23 @@ def update_password():
     return render_template('update_password.html', title='Update Account', form=form)
 
 
-@users.route("/update_users")
+@users.route("/update/users")
 @login_required
 def update_users():
     if not current_user.is_admin:
-        flash("Access deny", "danger")
-        return redirect("/")
+        abort(403)
     page = request.args.get('page', 1, type=int)
     users = User.query.order_by(
         User.surname.asc()).paginate(page=page, per_page=5)
     return render_template("users.html", title="Update Users", users=users)
+
+
+@users.route("/update/keys")
+@login_required
+def update_keys():
+    if not current_user.is_admin:
+        abort(403)
+    page = request.args.get('page', 1, type=int)
+    keys = Key.query.order_by(
+        Key.name.asc()).paginate(page=page, per_page=5)
+    return render_template("keys.html", title="Update Keys", keys=keys)

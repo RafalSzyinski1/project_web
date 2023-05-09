@@ -22,7 +22,7 @@
                 </div>
                 <div class="col">
                     <div class="text-truncate">
-                        <span class="font-weight-bold">Admin: </span>
+                        <span class="font-weight-bold">Admin:</span>
                         <br>
                         {% if not user.is_admin %}
                         <h4><i class="bi bi-x"></i></h4>
@@ -33,9 +33,9 @@
                 </div>
                 <div class="col-auto">
                     {% if user != current_user %}
-                    <button type="button" class="btn btn-primary" href="#">Edytuj</button>
+                    <button type="button" class="btn btn-primary" href="#">Edit</button>
                     {% else %}
-                    <button type="button" class="btn btn-primary" disabled>Edytuj</button>
+                    <button type="button" class="btn btn-primary" disabled>Edit</button>
                     {% endif %}
                 </div>
             </div>
@@ -46,19 +46,9 @@
 {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
 {% if page_num %}
 {% if users.page == page_num %}
-{% if user %}
-<a class="btn btn-info mb-4" href="{{ url_for('users.update_users', page=page_num, user=user) }}">{{ page_num }}</a>
+<a class="btn btn-info mb-4" href="{{ url_for('users.update_users', page=page_num) }}">{{ page_num }}</a>
 {% else %}
-<a class="btn btn-info mb-4" href="{{ url_for('users.update_users', page=page_num, key=key) }}">{{ page_num }}</a>
-{% endif %}
-{% else %}
-{% if user %}
-<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_users', page=page_num, user=user) }}">{{ page_num
-    }}</a>
-{% else %}
-<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_users', page=page_num, key=key) }}">{{ page_num
-    }}</a>
-{% endif %}
+<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_users', page=page_num) }}">{{ page_num }}</a>
 {% endif %}
 {% else %}
 ...
