@@ -69,7 +69,7 @@ def update_users():
         abort(403)
     page = request.args.get('page', 1, type=int)
     users = User.query.order_by(
-        User.surname.asc()).paginate(page=page, per_page=5)
+        User.surname.asc()).paginate(page=page, per_page=8)
     return render_template("users.html", title="Update Users", users=users)
 
 
@@ -81,7 +81,7 @@ def keys_for_user(user_id):
     user = User.query.get_or_404(user_id)
     page = request.args.get('page', 1, type=int)
     keys = Key.query.filter((Key.user_id == None) | (Key.user_id == user_id)).paginate(
-        page=page, per_page=10)
+        page=page, per_page=8)
     return render_template('keys_for_user.html', title=f"Keys for {user.name}", keys=keys, user_id=user_id, page=page)
 
 
@@ -154,7 +154,7 @@ def update_keys():
         abort(403)
     page = request.args.get('page', 1, type=int)
     keys = Key.query.order_by(
-        Key.name.asc()).paginate(page=page, per_page=5)
+        Key.name.asc()).paginate(page=page, per_page=8)
     return render_template("keys.html", title="Update Keys", keys=keys, page=page)
 
 
@@ -166,7 +166,7 @@ def users_for_key(key_id):
     key = Key.query.get_or_404(key_id)
     page = request.args.get('page', 1, type=int)
     users = User.query.paginate(
-        page=page, per_page=10)
+        page=page, per_page=8)
     return render_template('users_for_key.html', title=f"Users for {key.name}", users=users, key_id=key_id, page=page)
 
 
@@ -177,7 +177,7 @@ def locks_for_key(key_id):
         abort(403)
     key = Key.query.get_or_404(key_id)
     page = request.args.get('page', 1, type=int)
-    locks = Lock.query.paginate(page=page, per_page=10)
+    locks = Lock.query.paginate(page=page, per_page=8)
     key_locks = [Lock.query.join(KeyLocks).filter(
         (KeyLocks.key_id == key_id) & (l.id == KeyLocks.lock_id)).first() for l in locks.items]
     return render_template('locks_for_key.html', title=f"Locks for {key.name}", locks=locks, key_locks=key_locks, key_id=key_id, page=page)
@@ -240,7 +240,7 @@ def keys_for_lock(lock_id):
         abort(403)
     lock = Lock.query.get_or_404(lock_id)
     page = request.args.get('page', 1, type=int)
-    keys = Key.query.paginate(page=page, per_page=10)
+    keys = Key.query.paginate(page=page, per_page=8)
     key_locks = [Key.query.join(KeyLocks).filter(
         (KeyLocks.lock_id == lock_id) & (k.id == KeyLocks.key_id)).first() for k in keys.items]
     return render_template('keys_for_lock.html', title=f"Keys for {lock.name}", keys=keys, key_locks=key_locks, lock_id=lock_id, page=page)
