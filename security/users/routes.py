@@ -179,11 +179,11 @@ def locks_for_key(key_id):
     page = request.args.get('page', 1, type=int)
     locks = Lock.query.paginate(page=page, per_page=10)
     key_locks = [Lock.query.join(KeyLocks).filter(
-        KeyLocks.key_id == key_id and l.id == KeyLocks.id).first() for l in locks]
+        (KeyLocks.key_id == key_id) & (l.id == KeyLocks.lock_id)).first() for l in locks.items]
     return render_template('locks_for_key.html', title=f"Locks for {key.name}", locks=locks, key_locks=key_locks, key_id=key_id, page=page)
 
 
-@users.route("/keys/<int:key_id>/add_key_to_lock")
+@users.route("/keys/<int:key_id>/add_lock")
 @login_required
 def key_add_lock(key_id):
     if not current_user.is_admin:
@@ -191,19 +191,18 @@ def key_add_lock(key_id):
     Key.query.get_or_404(key_id)
 
     lock_id = request.args.get('lock_id', None, type=int)
-    page = request.args.get('page', 1, type=int)
 
     if key_id and lock_id:
         key_lock = KeyLocks(key_id=key_id, lock_id=lock_id)
         db.session.add(key_lock)
         db.session.commit()
-        flash('Lock has been added', 'info')
+        flash('Key-Lock has been updated', 'info')
     else:
         flash('Something wrong. Cannot add this lock to key', 'danger')
-    return redirect(url_for('users.locks_for_key', key_id=key_id, page=page))
+    return redirect(request.args.get('next', "/"))
 
 
-@users.route("/keys/<int:key_id>/remove_key_to_lock")
+@users.route("/keys/<int:key_id>/remove_lock")
 @login_required
 def key_remove_lock(key_id):
     if not current_user.is_admin:
@@ -211,17 +210,16 @@ def key_remove_lock(key_id):
     Key.query.get_or_404(key_id)
 
     lock_id = request.args.get('lock_id', None, type=int)
-    page = request.args.get('page', 1, type=int)
     if key_id and lock_id:
         key_lock = KeyLocks.query.filter_by(
             key_id=key_id).filter_by(lock_id=lock_id).first_or_404()
         db.session.delete(key_lock)
         db.session.commit()
-        flash('Lock has been removed', 'info')
+        flash('Key-Lock has been removed', 'info')
     else:
         flash('Something wrong. Cannot add this lock to key', 'danger')
         return redirect("/")
-    return redirect(url_for('users.locks_for_key', key_id=key_id, page=page))
+    return redirect(request.args.get('next', "/"))
 
 
 @users.route("/locks")
@@ -231,5 +229,18 @@ def update_locks():
         abort(403)
     page = request.args.get('page', 1, type=int)
     locks = Lock.query.order_by(
-        Lock.name.asc()).paginate(page=page, per_page=5)
+        Lock.name.asc()).paginate(page=page, per_page=8)
     return render_template("locks.html", title="Update Locks", locks=locks)
+
+
+@users.route("/locks/<int:lock_id>/keys_for_lock")
+@login_required
+def keys_for_lock(lock_id):
+    if not current_user.is_admin:
+        abort(403)
+    lock = Lock.query.get_or_404(lock_id)
+    page = request.args.get('page', 1, type=int)
+    keys = Key.query.paginate(page=page, per_page=10)
+    key_locks = [Key.query.join(KeyLocks).filter(
+        (KeyLocks.lock_id == lock_id) & (k.id == KeyLocks.key_id)).first() for k in keys.items]
+    return render_template('keys_for_lock.html', title=f"Keys for {lock.name}", keys=keys, key_locks=key_locks, lock_id=lock_id, page=page)

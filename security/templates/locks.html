@@ -18,7 +18,8 @@
                     <div class="text-truncate">
                         <span class="font-weight-bold">Keys:</span>
                         <br>
-                        <button type="button" class="btn btn-info btn-sm" href="#">Show/Add</button>
+                        <a type="button" class="btn btn-info btn-sm"
+                            href="{{ url_for('users.keys_for_lock', lock_id=lock.id) }}">Show/Add</a>
                     </div>
                 </div>
         </li>
@@ -31,9 +32,9 @@
 {% for page_num in locks.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
 {% if page_num %}
 {% if locks.page == page_num %}
-<a class="btn btn-info mb-4" href="{{ url_for('users.update_keys', page=page_num) }}">{{ page_num }}</a>
+<a class="btn btn-info mb-4" href="{{ url_for('users.update_locks', page=page_num) }}">{{ page_num }}</a>
 {% else %}
-<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_keys', page=page_num) }}">{{ page_num }}</a>
+<a class="btn btn-outline-info mb-4" href="{{ url_for('users.update_locks', page=page_num) }}">{{ page_num }}</a>
 {% endif %}
 {% else %}
 ...
