@@ -73,6 +73,46 @@ def update_users():
     return render_template("users.html", title="Update Users", users=users)
 
 
+@users.route("/users/<int:user_id>/show_key")
+@login_required
+def show_key_for_user(user_id):
+    if not current_user.is_admin:
+        abort(403)
+    user = User.query.get_or_404(user_id)
+    page = request.args.get('page', 1, type=int)
+    keys = Key.query.filter((Key.user_id == None) | (Key.user_id == user_id)).paginate(
+        page=page, per_page=10)
+    return render_template('keys_for_user.html', title=f"Keys for {user.name}", keys=keys, user_id=user_id, page=page)
+
+
+@users.route("/users/<int:user_id>/add_key")
+@login_required
+def user_add_key(user_id):
+    if not current_user.is_admin:
+        abort(403)
+    page = request.args.get('page', 1, type=int)
+    key_id = request.args.get('key_id', None, type=int)
+    key = Key.query.get_or_404(key_id)
+    key.user_id = user_id
+    db.session.commit()
+    flash('Key has been added to user', 'info')
+    return redirect(url_for('users.show_key_for_user', user_id=user_id, page=page))
+
+
+@users.route("/users/<int:user_id>/remove_key")
+@login_required
+def user_remove_key(user_id):
+    if not current_user.is_admin:
+        abort(403)
+    page = request.args.get('page', 1, type=int)
+    key_id = request.args.get('key_id', None, type=int)
+    key = Key.query.get_or_404(key_id)
+    key.user_id = None
+    db.session.commit()
+    flash('Key has been removed from user', 'info')
+    return redirect(url_for('users.show_key_for_user', user_id=user_id, page=page))
+
+
 @users.route("/users/<int:user_id>/edit_account", methods=["GET", "POST"])
 @login_required
 def edit_users_account(user_id):
@@ -120,20 +160,20 @@ def update_keys():
     return render_template("keys.html", title="Update Keys", keys=keys)
 
 
-@users.route("/keys/show_locks_for_key/<int:key_id>")
+@users.route("/keys/<int:key_id>/locks_for_key")
 @login_required
-def key_show_locks(key_id):
+def locks_for_key(key_id):
     if not current_user.is_admin:
         abort(403)
-    Key.query.get_or_404(key_id)
+    key = Key.query.get_or_404(key_id)
     page = request.args.get('page', 1, type=int)
     locks = Lock.query.paginate(page=page, per_page=10)
-    key_locks = Lock.query.join(KeyLocks).filter(
-        KeyLocks.key_id == key_id).all()
-    return render_template('locks_for_key.html', locks=locks, key_locks=key_locks, key_id=key_id, page=page)
+    key_locks = [Lock.query.join(KeyLocks).filter(
+        KeyLocks.key_id == key_id and l.id == KeyLocks.id).first() for l in locks]
+    return render_template('locks_for_key.html', title=f"Locks for {key.name}", locks=locks, key_locks=key_locks, key_id=key_id, page=page)
 
 
-@users.route("/keys/add_key_to_lock/<int:key_id>")
+@users.route("/keys/<int:key_id>/add_key_to_lock")
 @login_required
 def key_add_lock(key_id):
     if not current_user.is_admin:
@@ -150,10 +190,10 @@ def key_add_lock(key_id):
         flash('Lock has been added', 'info')
     else:
         flash('Something wrong. Cannot add this lock to key', 'danger')
-    return redirect(url_for('users.key_show_locks', key_id=key_id, page=page))
+    return redirect(url_for('users.locks_for_key', key_id=key_id, page=page))
 
 
-@users.route("/keys/remove_key_to_lock/<int:key_id>")
+@users.route("/keys/<int:key_id>/remove_key_to_lock")
 @login_required
 def key_remove_lock(key_id):
     if not current_user.is_admin:
@@ -165,14 +205,13 @@ def key_remove_lock(key_id):
     if key_id and lock_id:
         key_lock = KeyLocks.query.filter_by(
             key_id=key_id).filter_by(lock_id=lock_id).first_or_404()
-        print(key_lock)
         db.session.delete(key_lock)
         db.session.commit()
         flash('Lock has been removed', 'info')
     else:
         flash('Something wrong. Cannot add this lock to key', 'danger')
         return redirect("/")
-    return redirect(url_for('users.key_show_locks', key_id=key_id, page=page))
+    return redirect(url_for('users.locks_for_key', key_id=key_id, page=page))
 
 
 @users.route("/locks")
