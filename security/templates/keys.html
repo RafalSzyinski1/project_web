@@ -20,9 +20,12 @@
                         <br>
                         {% if key.key_user %}
                         <span class="text-muted">{{ key.key_user.name }}</span>
-                        <a type="button" class="btn btn-danger btn-sm ml-1" href="#"><i class="bi bi-x"></i></a>
+                        <a type="button" class="btn btn-danger btn-sm ml-1"
+                            href="{{ url_for('users.user_remove_key', key_id=key.id, next=url_for('users.update_keys', page=page)) }}"><i
+                                class="bi bi-x"></i></a>
                         {% else %}
-                        <a type="button" class="btn btn-info btn-sm" href="#">Add</a>
+                        <a type="button" class="btn btn-info btn-sm"
+                            href="{{ url_for('users.users_for_key', key_id=key.id) }}">Show/Add</a>
                         {% endif %}
                     </div>
                 </div>
@@ -33,9 +36,6 @@
                         <a type="button" class="btn btn-info btn-sm"
                             href="{{ url_for('users.locks_for_key', key_id=key.id) }}">Show/Add</a>
                     </div>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" href="#">Edit</button>
                 </div>
         </li>
         {% endfor %}

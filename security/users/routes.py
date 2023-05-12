@@ -75,7 +75,7 @@ def update_users():
 
 @users.route("/users/<int:user_id>/show_key")
 @login_required
-def show_key_for_user(user_id):
+def keys_for_user(user_id):
     if not current_user.is_admin:
         abort(403)
     user = User.query.get_or_404(user_id)
@@ -90,27 +90,25 @@ def show_key_for_user(user_id):
 def user_add_key(user_id):
     if not current_user.is_admin:
         abort(403)
-    page = request.args.get('page', 1, type=int)
     key_id = request.args.get('key_id', None, type=int)
     key = Key.query.get_or_404(key_id)
     key.user_id = user_id
     db.session.commit()
     flash('Key has been added to user', 'info')
-    return redirect(url_for('users.show_key_for_user', user_id=user_id, page=page))
+    return redirect(request.args.get('next', "/"))
 
 
-@users.route("/users/<int:user_id>/remove_key")
+@users.route("/users/remove_key")
 @login_required
-def user_remove_key(user_id):
+def user_remove_key():
     if not current_user.is_admin:
         abort(403)
-    page = request.args.get('page', 1, type=int)
     key_id = request.args.get('key_id', None, type=int)
     key = Key.query.get_or_404(key_id)
     key.user_id = None
     db.session.commit()
     flash('Key has been removed from user', 'info')
-    return redirect(url_for('users.show_key_for_user', user_id=user_id, page=page))
+    return redirect(request.args.get('next', "/"))
 
 
 @users.route("/users/<int:user_id>/edit_account", methods=["GET", "POST"])
@@ -157,7 +155,19 @@ def update_keys():
     page = request.args.get('page', 1, type=int)
     keys = Key.query.order_by(
         Key.name.asc()).paginate(page=page, per_page=5)
-    return render_template("keys.html", title="Update Keys", keys=keys)
+    return render_template("keys.html", title="Update Keys", keys=keys, page=page)
+
+
+@users.route("/keys/<int:key_id>/users_for_key")
+@login_required
+def users_for_key(key_id):
+    if not current_user.is_admin:
+        abort(403)
+    key = Key.query.get_or_404(key_id)
+    page = request.args.get('page', 1, type=int)
+    users = User.query.paginate(
+        page=page, per_page=10)
+    return render_template('users_for_key.html', title=f"Users for {key.name}", users=users, key_id=key_id, page=page)
 
 
 @users.route("/keys/<int:key_id>/locks_for_key")

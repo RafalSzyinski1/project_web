@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <h3 class="border-bottom">{{ title }}</h3>
+    <ul class="list-group">
+        {% if users.items %}
+        {% for user in users.items %}
+        <li class="list-group-item">
+            <div class="row justify-content-between">
+                <div class="col">
+                    <div class="text-truncate">
+                        <span class="font-weight-bold">Name:</span>
+                        <br>
+                        <span class="text-muted">{{ user.name }} {{ user.surname }}</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a type="button" class="btn btn-primary"
+                        href="{{ url_for('users.user_add_key', user_id=user.id, key_id=key_id, page=page, next=url_for('users.update_keys')) }}">Add</a>
+                </div>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li class="list-group-item">None</li>
+        {% endif %}
+    </ul>
+</div>
+{% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+{% if page_num %}
+{% if users.page == page_num %}
+<a class="btn btn-info mb-4" href="{{ url_for('users.users_for_key', key_id=key_id, page=page_num) }}">{{ page_num
+    }}</a>
+{% else %}
+<a class="btn btn-outline-info mb-4" href="{{ url_for('users.users_for_key', key_id=key_id, page=page_num) }}">{{
+    page_num }}</a>
+{% endif %}
+{% else %}
+...
+{% endif %}
+{% endfor %}
+{% endblock content %}

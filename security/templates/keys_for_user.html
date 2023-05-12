@@ -17,10 +17,10 @@
                 <div class="col-auto">
                     {% if key.user_id == None %}
                     <a type="button" class="btn btn-primary"
-                        href="{{ url_for('users.user_add_key', user_id=user_id, key_id=key.id, page=page) }}">Add</a>
+                        href="{{ url_for('users.user_add_key', user_id=user_id, key_id=key.id, page=page, next=url_for('users.keys_for_user', user_id=user_id, page=page)) }}">Add</a>
                     {% else %}
                     <a type="button" class="btn btn-danger"
-                        href="{{ url_for('users.user_remove_key', user_id=user_id, key_id=key.id, page=page) }}">Remove</a>
+                        href="{{ url_for('users.user_remove_key', user_id=user_id, key_id=key.id, page=page,next=url_for('users.keys_for_user', user_id=user_id, page=page)) }}">Remove</a>
                     {% endif %}
                 </div>
         </li>
@@ -33,10 +33,10 @@
 {% for page_num in keys.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
 {% if page_num %}
 {% if keys.page == page_num %}
-<a class="btn btn-info mb-4" href="{{ url_for('users.show_key_for_user', user_id=user_id, page=page_num) }}">{{ page_num
+<a class="btn btn-info mb-4" href="{{ url_for('users.keys_for_user', user_id=user_id, page=page_num) }}">{{ page_num
     }}</a>
 {% else %}
-<a class="btn btn-outline-info mb-4" href="{{ url_for('users.show_key_for_user', key_id=key_id, page=page_num) }}">{{
+<a class="btn btn-outline-info mb-4" href="{{ url_for('users.keys_for_user', key_id=key_id, page=page_num) }}">{{
     page_num }}</a>
 {% endif %}
 {% else %}
