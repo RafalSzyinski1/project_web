@@ -28,8 +28,8 @@ def init_locks():
 
 
 def init_history():
-    for _ in range(20):
-        for i in range(30):
+    for _ in range(1, 20):
+        for i in range(1, 30):
             db.session.add(KeyUsageHistory(key_id=i, lock_id=i))
         db.session.commit()
 
