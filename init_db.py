@@ -17,7 +17,7 @@ def init_users():
 
 def init_key():
     for i in range(30):
-        db.session.add(Key(name=f"Key{i+1}"))
+        db.session.add(Key(name=f"Key{i+1}", uid=f"ab{i}"))
     db.session.commit()
 
 
@@ -36,9 +36,9 @@ def init_history():
 
 def init_db_default():
     init_users()
-    init_key()
-    init_locks()
-    init_history()
+    # init_key()
+    # init_locks()
+    # init_history()
 
 
 with app.app_context():
