@@ -11,9 +11,9 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(254), nullable=False)
-    surname = db.Column(db.String(254), nullable=False)
-    email = db.Column(db.String(254), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    surname = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(60), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     image_file = db.Column(db.String(60), nullable=False,
@@ -32,8 +32,8 @@ class User(db.Model, UserMixin):
 
 class Key(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(254), nullable=False, unique=True)
-    uid = db.Column(db.String(5), nullable=False, unique=True)
+    name = db.Column(db.String(64), nullable=False, unique=True)
+    uid = db.Column(db.String(64), nullable=False, unique=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -46,7 +46,7 @@ class Key(db.Model):
 
 class Lock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(254), nullable=False, unique=True)
+    name = db.Column(db.String(64), nullable=False, unique=True)
 
     key_to_lock = db.relationship('KeyLocks', backref='lock', lazy=True)
     lock_usage = db.relationship('KeyUsageHistory', backref='lock', lazy=True)
